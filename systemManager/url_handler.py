@@ -9,7 +9,7 @@ from django.middleware.csrf import get_token
 def start_monitor(request):
     res = subprocess.run('ps -e | grep collect_metrics | grep -v grep', shell=True,capture_output=True)
     print(f"res.stdout={res.stdout}")
-    if res.stdout != b'':
+    if res.stdout != b'' :
         return JsonResponse({'status': 'task is running'})
     else:
         res = subprocess.run(f"{sys.executable} manage.py collect_metrics --interval 3 &",
