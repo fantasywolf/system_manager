@@ -17,11 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from systemManager import url_handler
+from monitor import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('startMonitor', url_handler.start_monitor),
-    path('stopMonitor', url_handler.stop_monitor),
-    path('csrftoken', url_handler.get_csrf_token),
+    path('startMonitor/', views.start_monitor),
+    path('stopMonitor/', views.stop_monitor),
+    path('overview/', views.overview),
+    path('cpu_detail/', views.cpu_detail),
+    path('mem_detail/', views.mem_detail),
+    path('disk_detail/', views.disk_detail),
+    path('net_detail/', views.net_detail),
 ]

@@ -10,7 +10,7 @@ class SystemMetrics(models.Model):
     timestamp = models.DateTimeField(default=timezone.now)
 
     # CPU 信息
-    cpu_usage = models.FloatField(help_text="CPU使用率(%)")
+    cpu_usage = models.CharField(max_length=100,help_text="CPU使用率(%)")
     cpu_load_1 = models.FloatField(help_text="1分钟平均负载")
     cpu_load_5 = models.FloatField(help_text="5分钟平均负载")
     cpu_load_15 = models.FloatField(help_text="15分钟平均负载")
@@ -30,11 +30,3 @@ class SystemMetrics(models.Model):
     # 网络信息
     net_sent = models.BigIntegerField(help_text="发送字节数")
     net_recv = models.BigIntegerField(help_text="接收字节数")
-
-    class Meta:
-        ordering = ['-timestamp']
-        verbose_name = '系统指标'
-        verbose_name_plural = '系统指标'
-
-    def __str__(self):
-        return f"系统指标 @ {self.timestamp}"
