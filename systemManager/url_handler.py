@@ -1,4 +1,3 @@
-import os
 import subprocess
 import sys
 
@@ -7,8 +6,7 @@ from django.middleware.csrf import get_token
 
 
 def start_monitor(request):
-    res = subprocess.run('ps -e | grep collect_metrics | grep -v grep', shell=True,capture_output=True)
-    print(f"res.stdout={res.stdout}")
+    res = subprocess.run('ps -ef | grep collect_metrics | grep -v grep', shell=True, capture_output=True)
     if res.stdout != b'':
         return JsonResponse({'status': 'task is running'})
     else:
@@ -21,7 +19,7 @@ def start_monitor(request):
 
 
 def stop_monitor(request):
-    res = subprocess.run("kill `ps -e | grep collect_metrics | grep -v grep | cut -d ' ' -f1`",
+    res = subprocess.run("kill `ps -ef | tr -s ' ' |  grep collect_metrics | grep -v grep | cut -d ' ' -f2`",
                          shell=True)
     if res.returncode == 0:
         return JsonResponse({'status': 'ok'})

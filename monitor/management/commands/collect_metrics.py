@@ -1,9 +1,10 @@
+import time
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from monitor.models import SystemMetrics
 from monitor.utils import collect_system_metrics
-import time
 
 
 class Command(BaseCommand):
