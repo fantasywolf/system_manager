@@ -28,4 +28,5 @@ urlpatterns = [
     path('mem_detail/', views.mem_detail),
     path('disk_detail/', views.disk_detail),
     path('net_detail/', views.net_detail),
+    path('range_data/', views.range_data),
 ]
