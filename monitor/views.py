@@ -3,14 +3,19 @@ import json
 import subprocess
 import sys
 from datetime import timedelta
-
 from django.http import JsonResponse, HttpResponseServerError
-from django.middleware.csrf import get_token
 from django.utils import timezone
-
 from monitor.models import SystemMetrics
 
+def keep_alive(func):
+    def inner(request):
+        try:
+            func(request)
+        except Exception as e:
+            return HttpResponseServerError(str(e))
+    return inner
 
+@keep_alive
 def start_monitor(request):
     res = subprocess.run('ps -ef | grep collect_metrics | grep -v grep', shell=True, capture_output=True)
     if res.stdout != b'':
@@ -23,7 +28,7 @@ def start_monitor(request):
         else:
             return JsonResponse({'status': 'not ok'})
 
-
+@keep_alive
 def stop_monitor(request):
     res = subprocess.run("kill `ps -ef | tr -s ' ' |  grep collect_metrics | grep -v grep | cut -d ' ' -f2`",
                          shell=True)
@@ -34,6 +39,7 @@ def stop_monitor(request):
 
 
 # 概览接口 获取 cpu 内存 磁盘 网络的 总体数据
+@keep_alive
 def overview(request):
     data = SystemMetrics.objects.latest('timestamp')
     return JsonResponse({'cpu_usage': data.cpu_usage,
@@ -45,6 +51,7 @@ def overview(request):
 
 
 # cpu详情数据：cpu每个内核的使用率，
+@keep_alive
 def cpu_detail(request):
     data = SystemMetrics.objects.latest('timestamp')
     return JsonResponse({'cpu_usage': data.cpu_usage,
@@ -54,6 +61,7 @@ def cpu_detail(request):
 
 
 # 内存的详情数据： 内存已使用了 ， 未使用，可获取的...
+@keep_alive
 def mem_detail(request):
     data = SystemMetrics.objects.latest('timestamp')
     return JsonResponse({'mem_usage': data.mem_usage,
@@ -63,6 +71,7 @@ def mem_detail(request):
 
 
 # disk详情数据：有多少个分区，每个分区多少兆， 使用率
+@keep_alive
 def disk_detail(request):
     data = SystemMetrics.objects.latest('timestamp')
     return JsonResponse({'disk_usage': data.disk_usage,
@@ -72,12 +81,15 @@ def disk_detail(request):
 
 
 # 网络数据获取
+@keep_alive
 def net_detail(request):
     data = SystemMetrics.objects.latest('timestamp')
     return JsonResponse({'net_recv': data.net_recv,
                          'net_sent': data.net_sent, })
 
+
 # 获取多少分钟内的数据
+@keep_alive # ==> keep_alive(range_data)
 def range_data(request):
     if request.method == 'POST':
         # minutes = int(request.POST.get("minutes"))
@@ -91,3 +103,5 @@ def range_data(request):
             return HttpResponseServerError("不能超过180分钟")
     else:
         return HttpResponseServerError("请使用post请求")
+
+
